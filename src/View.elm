@@ -39,9 +39,9 @@ badInputMessage badInput =
         ""
 
 
-searchPage { plate, onPlateInput, onSubmitClick, badInput } =
+searchPage { plate, onPlateInput, onSubmitClick, badInput, relativePath } =
     form [ class "regular-page", onSubmit onSubmitClick ]
-        [ img [ src "/emoji.png", height 128, width 128 ] []
+        [ img [ src (relativePath ++ "emoji.png"), height 128, width 128 ] []
         , p [ class "subtitle" ]
             [ text "¿Puede tu vehículo circular hoy en GYE?" ]
         , div
@@ -71,12 +71,12 @@ searchPage { plate, onPlateInput, onSubmitClick, badInput } =
         ]
 
 
-newQueryFooter =
+newQueryFooter relativePath =
     footer [ class "footer" ]
-        [ a [ href "/" ] [ text "Nueva consulta" ] ]
+        [ a [ href relativePath ] [ text "Nueva consulta" ] ]
 
 
-resultPage { plate, zone, date, isAllowed } =
+resultPage { plate, zone, date, isAllowed, relativePath } =
     let
         sectionClass =
             if isAllowed then
@@ -119,12 +119,12 @@ resultPage { plate, zone, date, isAllowed } =
                         ]
                     ]
                 ]
-            , newQueryFooter
+            , newQueryFooter relativePath
             ]
 
 
-notFoundPage =
+notFoundPage { relativePath } =
     div [ class "regular-page" ]
         [ h1 [ class "title" ] [ text "Página No Encontrada" ]
-        , newQueryFooter
+        , newQueryFooter relativePath
         ]

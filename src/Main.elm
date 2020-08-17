@@ -40,12 +40,12 @@ defaultPage =
 
 
 type alias Model =
-    { key : Nav.Key, page : Page }
+    { key : Nav.Key, page : Page, relativePath : String }
 
 
-init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    updateWithUrl url { key = key, page = defaultPage }
+    updateWithUrl url { key = key, relativePath = flags, page = defaultPage }
 
 
 
@@ -124,8 +124,11 @@ update msg model =
             case Plate.fromString pageModel.input of
                 Just plate ->
                     let
+                        queryString =
+                            "?consulta=" ++ Plate.print plate
+
                         newUrl =
-                            "/?consulta=" ++ Plate.print plate
+                            model.relativePath ++ queryString
                     in
                         ( model, Nav.pushUrl model.key newUrl )
 
@@ -167,6 +170,7 @@ bodyView m =
                 , badInput = model.badInput
                 , onPlateInput = SetPlate
                 , onSubmitClick = SubmitPlate
+                , relativePath = m.relativePath
                 }
 
         ResultPage model ->
@@ -175,10 +179,11 @@ bodyView m =
                 , zone = model.zone
                 , date = model.date
                 , isAllowed = model.isAllowed
+                , relativePath = m.relativePath
                 }
 
         _ ->
-            View.notFoundPage
+            View.notFoundPage { relativePath = m.relativePath }
 
 
 view : Model -> Browser.Document Msg
@@ -192,7 +197,7 @@ view model =
 ---- PROGRAM ----
 
 
-main : Program () Model Msg
+main : Program String Model Msg
 main =
     Browser.application
         { view = view

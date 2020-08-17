@@ -1,6 +1,6 @@
 module Router exposing (Route(..), routeParser)
 
-import Url.Parser exposing (Parser, (<?>), top, map, oneOf)
+import Url.Parser exposing (Parser, (<?>), top, map, oneOf, s)
 import Url.Parser.Query as Query
 
 
@@ -23,5 +23,9 @@ routeParser =
     oneOf
         [ map maybeQueryPlate
             (top <?> Query.string "consulta")
+
+        -- this one is only for gh pages
+        , map maybeQueryPlate
+            (s "SemaforoGYE" <?> Query.string "consulta")
         , map Home top
         ]
