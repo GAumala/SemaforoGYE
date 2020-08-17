@@ -4,6 +4,7 @@ import Html
     exposing
         ( Html
         , div
+        , br
         , input
         , img
         , a
@@ -18,12 +19,15 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( class
+        ( attribute
+        , alt
+        , class
         , type_
         , placeholder
         , value
         , href
         , src
+        , hidden
         , height
         , width
         )
@@ -39,9 +43,9 @@ badInputMessage badInput =
         ""
 
 
-searchPage { plate, onPlateInput, onSubmitClick, badInput, relativePath } =
+searchPage { plate, onPlateInput, onSubmitClick, badInput } =
     form [ class "regular-page", onSubmit onSubmitClick ]
-        [ img [ src (relativePath ++ "emoji.png"), height 128, width 128 ] []
+        [ img [ src "./emoji.png", height 128, width 128 ] []
         , p [ class "subtitle" ]
             [ text "¿Puede tu vehículo circular hoy en GYE?" ]
         , div
@@ -68,21 +72,32 @@ searchPage { plate, onPlateInput, onSubmitClick, badInput, relativePath } =
             ]
         , p [ class "help is-danger" ]
             [ text <| badInputMessage badInput ]
+        , pageFooter
         ]
 
 
-newQueryFooter relativePath =
+githubButton =
+    a
+        [ href "https://github.com/GAumala/SemaforoGYE"
+        , alt "View on GitHub"
+        ]
+        [ img [ class "gh-icon", src "./github.svg" ] []
+        ]
+
+
+pageFooter =
     footer [ class "footer" ]
-        [ a [ href relativePath ] [ text "Nueva consulta" ] ]
+        [ githubButton
+        ]
 
 
-resultPage { plate, zone, date, isAllowed, relativePath } =
+resultPage { plate, zone, date, isAllowed, rootPath } =
     let
-        sectionClass =
+        colorClass =
             if isAllowed then
-                "hero is-success"
+                class "is-success"
             else
-                "hero is-danger"
+                class "is-danger"
 
         sectionTitle =
             if isAllowed then
@@ -111,20 +126,30 @@ resultPage { plate, zone, date, isAllowed, relativePath } =
                 ++ "."
     in
         div []
-            [ section [ class sectionClass ]
+            [ section [ class "hero", colorClass ]
                 [ div [ class "hero-body" ]
                     [ div [ class "container" ]
                         [ h1 [ class "title" ] [ text sectionTitle ]
                         , h2 [ class "subtitle" ] [ text sectionSubtitle ]
+                        , br []
+                            []
+                        , a
+                            [ class "button is-inverted is-outlined"
+                            , colorClass
+                            , href rootPath
+                            ]
+                            [ text "Nueva consulta" ]
                         ]
                     ]
                 ]
-            , newQueryFooter relativePath
+            , br [] []
+            , pageFooter
             ]
 
 
-notFoundPage { relativePath } =
+notFoundPage { rootPath } =
     div [ class "regular-page" ]
         [ h1 [ class "title" ] [ text "Página No Encontrada" ]
-        , newQueryFooter relativePath
+        , br [] []
+        , pageFooter
         ]

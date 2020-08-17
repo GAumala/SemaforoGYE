@@ -40,12 +40,12 @@ defaultPage =
 
 
 type alias Model =
-    { key : Nav.Key, page : Page, relativePath : String }
+    { key : Nav.Key, page : Page, rootPath : String }
 
 
 init : String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    updateWithUrl url { key = key, relativePath = flags, page = defaultPage }
+    updateWithUrl url { key = key, rootPath = flags, page = defaultPage }
 
 
 
@@ -55,9 +55,9 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url
-    | SetPlate String
+    | InputPlate String
     | SubmitPlate
-    | ValidatePlate Plate ( Time.Zone, Time.Posix )
+    | ShowResult Plate ( Time.Zone, Time.Posix )
 
 
 updateWithUrl : Url -> Model -> ( Model, Cmd Msg )
@@ -66,23 +66,13 @@ updateWithUrl url model =
         ( Just Home, SearchPage _ ) ->
             ( model, Cmd.none )
 
-        ( Just Home, ResultPage pageModel ) ->
-            let
-                newPage =
-                    SearchPage
-                        { input = Plate.print pageModel.plate
-                        , badInput = False
-                        }
-            in
-                ( { model | page = newPage }, Cmd.none )
-
         ( Just Home, _ ) ->
             ( { model | page = defaultPage }, Cmd.none )
 
         ( Just (QueryPlate str), _ ) ->
             case Plate.fromString str of
                 Just plate ->
-                    ( model, Task.perform (ValidatePlate plate) readSystemTime )
+                    ( model, Task.perform (ShowResult plate) readSystemTime )
 
                 Nothing ->
                     let
@@ -109,7 +99,7 @@ update msg model =
         ( UrlChanged url, _ ) ->
             updateWithUrl url model
 
-        ( SetPlate placa, SearchPage pageModel ) ->
+        ( InputPlate placa, SearchPage pageModel ) ->
             let
                 newPage =
                     SearchPage
@@ -128,7 +118,7 @@ update msg model =
                             "?consulta=" ++ Plate.print plate
 
                         newUrl =
-                            model.relativePath ++ queryString
+                            model.rootPath ++ queryString
                     in
                         ( model, Nav.pushUrl model.key newUrl )
 
@@ -137,7 +127,7 @@ update msg model =
                     , Cmd.none
                     )
 
-        ( ValidatePlate plate ( zone, time ), _ ) ->
+        ( ShowResult plate ( zone, time ), _ ) ->
             let
                 newPage =
                     ResultPage
@@ -150,7 +140,7 @@ update msg model =
                 ( { model | page = newPage }, Cmd.none )
 
         -- invalid combinations
-        ( SetPlate placa, _ ) ->
+        ( InputPlate _, _ ) ->
             ( model, Cmd.none )
 
         ( SubmitPlate, _ ) ->
@@ -168,9 +158,8 @@ bodyView m =
             View.searchPage
                 { plate = model.input
                 , badInput = model.badInput
-                , onPlateInput = SetPlate
+                , onPlateInput = InputPlate
                 , onSubmitClick = SubmitPlate
-                , relativePath = m.relativePath
                 }
 
         ResultPage model ->
@@ -179,11 +168,11 @@ bodyView m =
                 , zone = model.zone
                 , date = model.date
                 , isAllowed = model.isAllowed
-                , relativePath = m.relativePath
+                , rootPath = m.rootPath
                 }
 
         _ ->
-            View.notFoundPage { relativePath = m.relativePath }
+            View.notFoundPage { rootPath = m.rootPath }
 
 
 view : Model -> Browser.Document Msg

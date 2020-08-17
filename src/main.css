@@ -38,3 +38,8 @@ img {
 footer.footer {
   background-color: #FFF
 }
+
+.gh-icon {
+  height: 1.7rem;
+  width: 1.7rem;
+}
