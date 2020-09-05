@@ -1,11 +1,14 @@
 module Semaforo exposing (isAllowed)
 
-import Time exposing (Posix, Weekday(..), Zone, toWeekday, toDay)
+import Time exposing (Month(..), Posix, Weekday(..), Zone, toWeekday, toDay, toMonth)
 import Plate exposing (Plate)
 
 
 -- circulacion con semaforo en amarillo
+-- Agosto:
 -- https://www.eluniverso.com/sites/default/files/fotos/2020/07/circulacion-ago-2600.jpg
+-- Septiembre:
+-- https://twitter.com/ATMGuayaquil/status/1300858691571322881
 
 
 august20Algorithm : Plate -> Zone -> Posix -> Bool
@@ -32,10 +35,7 @@ august20Algorithm plate zone date =
         ( Sun, isEven ) ->
             let
                 allowedDays =
-                    if isEven then
-                        [ 9, 23 ]
-                    else
-                        [ 2, 16, 30 ]
+                    allowedSundays plate.isEven zone date
 
                 day =
                     toDay zone date
@@ -44,6 +44,25 @@ august20Algorithm plate zone date =
 
         _ ->
             False
+
+
+allowedSundays : Bool -> Zone -> Posix -> List Int
+allowedSundays isEven zone date =
+    case toMonth zone date of
+        Aug ->
+            if isEven then
+                [ 9, 23 ]
+            else
+                [ 2, 16, 30 ]
+
+        Sep ->
+            if isEven then
+                [ 6, 20 ]
+            else
+                [ 13, 27 ]
+
+        _ ->
+            []
 
 
 isAllowed : Plate -> Zone -> Posix -> Bool
