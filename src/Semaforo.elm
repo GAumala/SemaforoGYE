@@ -1,6 +1,16 @@
 module Semaforo exposing (isAllowed)
 
-import Time exposing (Month(..), Posix, Weekday(..), Zone, toWeekday, toDay, toMonth)
+import Time
+    exposing
+        ( Month(..)
+        , Posix
+        , Weekday(..)
+        , Zone
+        , toWeekday
+        , toDay
+        , toMonth
+        , toYear
+        )
 import Plate exposing (Plate)
 
 
@@ -50,26 +60,26 @@ august20Algorithm plate zone date =
 
 allowedSundays : Bool -> Zone -> Posix -> List Int
 allowedSundays isEven zone date =
-    case toMonth zone date of
-        Aug ->
+    case ( toMonth zone date, toYear zone date ) of
+        ( Aug, 2020 ) ->
             if isEven then
                 [ 9, 23 ]
             else
                 [ 2, 16, 30 ]
 
-        Sep ->
+        ( Sep, 2020 ) ->
             if isEven then
                 [ 6, 20 ]
             else
                 [ 13, 27 ]
 
-        Dec ->
+        ( Dec, 2020 ) ->
             if isEven then
                 []
             else
                 [ 27 ]
 
-        Jan ->
+        ( Jan, 2021 ) ->
             if isEven then
                 [ 3 ]
             else
