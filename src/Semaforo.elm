@@ -9,6 +9,8 @@ import Plate exposing (Plate)
 -- https://www.eluniverso.com/sites/default/files/fotos/2020/07/circulacion-ago-2600.jpg
 -- Septiembre:
 -- https://twitter.com/ATMGuayaquil/status/1300858691571322881
+-- Diciembre y Enero 2021:
+-- https://twitter.com/ATMGuayaquil/status/1341182940412338178
 
 
 august20Algorithm : Plate -> Zone -> Posix -> Bool
@@ -60,6 +62,18 @@ allowedSundays isEven zone date =
                 [ 6, 20 ]
             else
                 [ 13, 27 ]
+
+        Dec ->
+            if isEven then
+                []
+            else
+                [ 27 ]
+
+        Jan ->
+            if isEven then
+                [ 3 ]
+            else
+                []
 
         _ ->
             []
